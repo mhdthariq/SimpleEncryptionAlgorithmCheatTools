@@ -74,6 +74,7 @@ func (v *Vigenere) Run(reader *bufio.Reader, plaintext string, key string) {
 
 	v.printSetup()
 	v.printTabulaRecta()
+	v.printInteractiveLookup()
 	v.processText()
 	v.printStepByStep()
 	v.printResults()
@@ -156,24 +157,80 @@ func (v *Vigenere) printSetup() {
 
 func (v *Vigenere) printTabulaRecta() {
 	ui.PrintSectionHeader("TABULA RECTA (VIGENÈRE TABLE)")
-	fmt.Println(ui.BrightCyanBold("📊 The Vigenère square shows all possible Caesar shifts:"))
+	fmt.Println(ui.BrightCyanBold("📊 The complete Vigenère square (26×26) - All possible Caesar shifts:"))
 	fmt.Println(ui.BrightYellow("   • Each row is shifted one position from the previous"))
-	fmt.Println(ui.BrightYellow("   • The key letter determines which row to use"))
-	fmt.Println(ui.BrightYellow("   • The plaintext letter determines which column to use"))
+	fmt.Println(ui.BrightYellow("   • The key letter determines which ROW to use"))
+	fmt.Println(ui.BrightYellow("   • The plaintext letter determines which COLUMN to use"))
+	fmt.Println(ui.BrightMagenta("   • The intersection gives you the ciphertext letter!"))
 	fmt.Println()
 
-	// Print a compact version (first 13 rows for display purposes)
-	displayRows := 13
-	if displayRows > len(v.alphabet) {
-		displayRows = len(v.alphabet)
+	// Get first few characters for demonstration
+	cleanKey := v.cleanText(v.key)
+	cleanPlain := v.cleanText(v.plaintext)
+
+	// Collect demo positions (first 3 characters)
+	demoPositions := make([]struct {
+		plainChar rune
+		keyChar   rune
+		plainPos  int
+		keyPos    int
+		cipherPos int
+	}, 0)
+
+	if len(cleanKey) > 0 && len(cleanPlain) > 0 {
+		for i := 0; i < len(cleanPlain) && i < 3; i++ {
+			plainChar := rune(cleanPlain[i])
+			keyChar := rune(cleanKey[i%len(cleanKey)])
+			plainPos := strings.IndexRune(v.alphabet, plainChar)
+			keyPos := strings.IndexRune(v.alphabet, keyChar)
+
+			if plainPos >= 0 && keyPos >= 0 {
+				var cipherPos int
+				if v.mode == "encrypt" {
+					cipherPos = (plainPos + keyPos) % len(v.alphabet)
+				} else {
+					cipherPos = (plainPos - keyPos + len(v.alphabet)) % len(v.alphabet)
+				}
+
+				demoPositions = append(demoPositions, struct {
+					plainChar rune
+					keyChar   rune
+					plainPos  int
+					keyPos    int
+					cipherPos int
+				}{plainChar, keyChar, plainPos, keyPos, cipherPos})
+			}
+		}
 	}
 
-	// Header row
+	// Print header with column numbers
+	fmt.Print(ui.BrightBlueBold("     "))
+	for i := 0; i < len(v.alphabet); i++ {
+		if i < 10 {
+			fmt.Print(ui.Yellow(fmt.Sprintf("%d ", i)))
+		} else {
+			fmt.Print(ui.Yellow(fmt.Sprintf("%d", i)))
+		}
+	}
+	fmt.Println()
+
+	// Header row with letters
 	fmt.Print(ui.MagentaBold("   │ "))
 	for i := 0; i < len(v.alphabet); i++ {
-		fmt.Print(ui.CyanBold(string(v.alphabet[i])) + " ")
+		// Highlight columns used in demo
+		highlighted := false
+		for _, demo := range demoPositions {
+			if demo.plainPos == i {
+				fmt.Print(ui.BrightGreenBold(string(v.alphabet[i])) + " ")
+				highlighted = true
+				break
+			}
+		}
+		if !highlighted {
+			fmt.Print(ui.CyanBold(string(v.alphabet[i])) + " ")
+		}
 	}
-	fmt.Println()
+	fmt.Println(ui.Yellow(" ← Plaintext (column)"))
 
 	// Separator
 	fmt.Print(ui.MagentaBold("───┼"))
@@ -182,35 +239,307 @@ func (v *Vigenere) printTabulaRecta() {
 	}
 	fmt.Println()
 
-	// Table rows
-	for row := 0; row < displayRows; row++ {
-		fmt.Print(ui.MagentaBold(fmt.Sprintf(" %c │ ", v.alphabet[row])))
+	// Print all 26 rows
+	for row := 0; row < len(v.alphabet); row++ {
+		// Row header with highlighting
+		rowHighlighted := false
+		for _, demo := range demoPositions {
+			if demo.keyPos == row {
+				fmt.Print(ui.BrightMagentaBold(fmt.Sprintf(" %c │ ", v.alphabet[row])))
+				rowHighlighted = true
+				break
+			}
+		}
+		if !rowHighlighted {
+			fmt.Print(ui.MagentaBold(fmt.Sprintf(" %c │ ", v.alphabet[row])))
+		}
+
+		// Row cells
 		for col := 0; col < len(v.alphabet); col++ {
 			shiftedIdx := (col + row) % len(v.alphabet)
 			char := string(v.alphabet[shiftedIdx])
 
-			// Highlight diagonal
-			if row == col {
-				fmt.Print(ui.BrightYellow(char) + " ")
-			} else if row < 3 || col < 3 {
+			// Check if this cell is used in encryption demo
+			isDemo := false
+			demoNum := 0
+			for idx, demo := range demoPositions {
+				if demo.keyPos == row && demo.plainPos == col {
+					isDemo = true
+					demoNum = idx + 1
+					break
+				}
+			}
+
+			if isDemo {
+				// Highlight the actual encryption cells with background effect
+				if demoNum == 1 {
+					fmt.Print(ui.BrightRedBold(char) + ui.Red("●"))
+				} else if demoNum == 2 {
+					fmt.Print(ui.BrightYellowBold(char) + ui.Yellow("●"))
+				} else {
+					fmt.Print(ui.BrightCyanBold(char) + ui.Cyan("●"))
+				}
+			} else if row == col {
+				// Diagonal (same letter - no shift)
+				fmt.Print(ui.Yellow(char) + " ")
+			} else if demo := findDemoInRow(row, col, demoPositions); demo != nil {
+				// Same row or column as demo
 				fmt.Print(ui.BrightCyan(char) + " ")
 			} else {
+				// Regular cell
 				fmt.Print(ui.Cyan(char) + " ")
+			}
+		}
+
+		// Row annotation
+		if rowHighlighted {
+			fmt.Print(ui.BrightMagenta(fmt.Sprintf(" ← Key '%c' (shift +%d)", v.alphabet[row], row)))
+		}
+		fmt.Println()
+	}
+
+	fmt.Println()
+	fmt.Println(ui.BrightGreen("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Println(ui.BrightGreenBold("💡 HOW TO READ THE TABLE:"))
+	fmt.Println(ui.Green("   1️⃣  Find your PLAINTEXT letter in the TOP ROW (column header) — shown in GREEN"))
+	fmt.Println(ui.Green("   2️⃣  Find your KEY letter in the LEFT COLUMN (row header) — shown in MAGENTA"))
+	fmt.Println(ui.Green("   3️⃣  Follow the column DOWN and the row ACROSS to find the intersection"))
+	fmt.Println(ui.Green("   4️⃣  The letter at the intersection is your CIPHERTEXT letter!"))
+	fmt.Println()
+
+	// Show live examples if we have demo data
+	if len(demoPositions) > 0 {
+		fmt.Println(ui.BrightYellowBold("🎯 LIVE EXAMPLES FROM YOUR TEXT:"))
+		fmt.Println()
+
+		for idx, demo := range demoPositions {
+			cipherChar := rune(v.alphabet[demo.cipherPos])
+
+			var color func(string) string
+			var symbol string
+			if idx == 0 {
+				color = ui.BrightRedBold
+				symbol = "●"
+			} else if idx == 1 {
+				color = ui.BrightYellowBold
+				symbol = "●"
+			} else {
+				color = ui.BrightCyanBold
+				symbol = "●"
+			}
+
+			fmt.Println(color(fmt.Sprintf("   Example %d %s:", idx+1, symbol)))
+			if v.mode == "encrypt" {
+				fmt.Println(ui.BrightGreen(fmt.Sprintf("      Plaintext:  '%c' (column %d)", demo.plainChar, demo.plainPos)))
+				fmt.Println(ui.BrightMagenta(fmt.Sprintf("      Key:        '%c' (row %d, shift +%d)", demo.keyChar, demo.keyPos, demo.keyPos)))
+				fmt.Println(color(fmt.Sprintf("      ➜ Ciphertext: '%c' (position %d) %s", cipherChar, demo.cipherPos, symbol)))
+				fmt.Println(ui.Yellow(fmt.Sprintf("      Formula: (%d + %d) mod 26 = %d", demo.plainPos, demo.keyPos, demo.cipherPos)))
+			} else {
+				fmt.Println(ui.BrightGreen(fmt.Sprintf("      Ciphertext: '%c' (column %d)", demo.plainChar, demo.plainPos)))
+				fmt.Println(ui.BrightMagenta(fmt.Sprintf("      Key:        '%c' (row %d, shift -%d)", demo.keyChar, demo.keyPos, demo.keyPos)))
+				fmt.Println(color(fmt.Sprintf("      ➜ Plaintext:  '%c' (position %d) %s", cipherChar, demo.cipherPos, symbol)))
+				fmt.Println(ui.Yellow(fmt.Sprintf("      Formula: (%d - %d + 26) mod 26 = %d", demo.plainPos, demo.keyPos, demo.cipherPos)))
+			}
+			fmt.Println()
+		}
+		fmt.Println(ui.BrightCyan("   💫 Look for the colored markers (●) in the table above to see these encryptions!"))
+	}
+
+	fmt.Println()
+	fmt.Println(ui.BrightGreen("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Println()
+}
+
+// Helper function to check if a cell is in the same row or column as demo
+func findDemoInRow(row, col int, demos []struct {
+	plainChar rune
+	keyChar   rune
+	plainPos  int
+	keyPos    int
+	cipherPos int
+}) *struct {
+	plainChar rune
+	keyChar   rune
+	plainPos  int
+	keyPos    int
+	cipherPos int
+} {
+	for _, demo := range demos {
+		if demo.keyPos == row || demo.plainPos == col {
+			return &demo
+		}
+	}
+	return nil
+}
+
+func (v *Vigenere) printInteractiveLookup() {
+	ui.PrintSectionHeader("INTERACTIVE TABLE LOOKUP GUIDE")
+	fmt.Println(ui.BrightCyanBold("🎓 Let's practice using the Vigenère table step-by-step!"))
+	fmt.Println()
+
+	cleanKey := v.cleanText(v.key)
+	cleanPlain := v.cleanText(v.plaintext)
+
+	if len(cleanKey) == 0 || len(cleanPlain) == 0 {
+		return
+	}
+
+	// Take first character as example
+	plainChar := rune(cleanPlain[0])
+	keyChar := rune(cleanKey[0])
+	plainPos := strings.IndexRune(v.alphabet, plainChar)
+	keyPos := strings.IndexRune(v.alphabet, keyChar)
+
+	if plainPos < 0 || keyPos < 0 {
+		return
+	}
+
+	var cipherPos int
+	if v.mode == "encrypt" {
+		cipherPos = (plainPos + keyPos) % len(v.alphabet)
+	} else {
+		cipherPos = (plainPos - keyPos + len(v.alphabet)) % len(v.alphabet)
+	}
+	cipherChar := rune(v.alphabet[cipherPos])
+
+	fmt.Println(ui.BrightYellowBold(fmt.Sprintf("📝 Example: Encrypting '%c' with key '%c'", plainChar, keyChar)))
+	fmt.Println()
+
+	// Step 1: Find column
+	fmt.Println(ui.BrightGreenBold("STEP 1: Find the PLAINTEXT letter in the top row (columns)"))
+	fmt.Println()
+	fmt.Print(ui.Cyan("   Columns: "))
+	for i := 0; i < len(v.alphabet); i++ {
+		if i == plainPos {
+			fmt.Print(ui.BrightGreenBold(fmt.Sprintf("[%c]", v.alphabet[i])) + " ")
+		} else if i == plainPos-1 || i == plainPos+1 {
+			fmt.Print(ui.Green(string(v.alphabet[i])) + " ")
+		} else {
+			fmt.Print(ui.Cyan(string(v.alphabet[i])) + " ")
+		}
+	}
+	fmt.Println()
+	fmt.Print(ui.Green("            "))
+	for i := 0; i < plainPos; i++ {
+		fmt.Print("  ")
+	}
+	fmt.Println(ui.BrightGreen("▲"))
+	fmt.Println(ui.BrightGreenBold(fmt.Sprintf("   Found '%c' at column %d!", plainChar, plainPos)))
+	fmt.Println()
+
+	// Step 2: Find row
+	fmt.Println(ui.BrightMagentaBold("STEP 2: Find the KEY letter in the left column (rows)"))
+	fmt.Println()
+
+	startRow := max(0, keyPos-2)
+	endRow := min(len(v.alphabet), keyPos+3)
+
+	for i := startRow; i < endRow; i++ {
+		if i == keyPos {
+			fmt.Print(ui.BrightMagentaBold(fmt.Sprintf("   ► %c ◄", v.alphabet[i])))
+			fmt.Println(ui.BrightMagenta(fmt.Sprintf(" ← KEY letter (row %d)", i)))
+		} else {
+			fmt.Println(ui.Magenta(fmt.Sprintf("     %c", v.alphabet[i])))
+		}
+	}
+	fmt.Println()
+	fmt.Println(ui.BrightMagentaBold(fmt.Sprintf("   Found '%c' at row %d!", keyChar, keyPos)))
+	fmt.Println()
+
+	// Step 3: Find intersection
+	fmt.Println(ui.BrightCyanBold("STEP 3: Find the INTERSECTION of column and row"))
+	fmt.Println()
+	fmt.Println(ui.Cyan("   Visual representation:"))
+	fmt.Println()
+
+	// ASCII art table lookup
+	fmt.Print(ui.Yellow("        "))
+	for i := max(0, plainPos-3); i < min(len(v.alphabet), plainPos+4); i++ {
+		if i == plainPos {
+			fmt.Print(ui.BrightGreenBold(fmt.Sprintf("%c  ", v.alphabet[i])))
+		} else {
+			fmt.Print(ui.Yellow(fmt.Sprintf("%c  ", v.alphabet[i])))
+		}
+	}
+	fmt.Println(ui.Yellow(" ← Columns (Plaintext)"))
+
+	for row := max(0, keyPos-2); row < min(len(v.alphabet), keyPos+3); row++ {
+		if row == keyPos {
+			fmt.Print(ui.BrightMagentaBold(fmt.Sprintf("   %c →  ", v.alphabet[row])))
+		} else {
+			fmt.Print(ui.Magenta(fmt.Sprintf("   %c    ", v.alphabet[row])))
+		}
+
+		for col := max(0, plainPos-3); col < min(len(v.alphabet), plainPos+4); col++ {
+			shiftedIdx := (col + row) % len(v.alphabet)
+			char := string(v.alphabet[shiftedIdx])
+
+			if row == keyPos && col == plainPos {
+				// The intersection!
+				fmt.Print(ui.BrightRedBold(fmt.Sprintf("[%s]", char)))
+			} else if row == keyPos {
+				fmt.Print(ui.BrightMagenta(fmt.Sprintf(" %s ", char)))
+			} else if col == plainPos {
+				fmt.Print(ui.BrightGreen(fmt.Sprintf(" %s ", char)))
+			} else {
+				fmt.Print(ui.Cyan(fmt.Sprintf(" %s ", char)))
 			}
 		}
 		fmt.Println()
 	}
 
-	if displayRows < len(v.alphabet) {
-		fmt.Println(ui.Yellow(fmt.Sprintf("   ... (showing %d of %d rows) ...", displayRows, len(v.alphabet))))
+	fmt.Println()
+	fmt.Println(ui.BrightRedBold(fmt.Sprintf("   ✨ RESULT: The intersection is '%c'!", cipherChar)))
+	fmt.Println()
+
+	// Show the calculation
+	fmt.Println(ui.BrightYellowBold("STEP 4: Verify with mathematics"))
+	fmt.Println()
+	if v.mode == "encrypt" {
+		fmt.Println(ui.Yellow(fmt.Sprintf("   Plaintext '%c' = position %d", plainChar, plainPos)))
+		fmt.Println(ui.Yellow(fmt.Sprintf("   Key '%c'       = position %d (shift)", keyChar, keyPos)))
+		fmt.Println(ui.Yellow("   ───────────────────────────────"))
+		fmt.Println(ui.BrightYellow(fmt.Sprintf("   (%d + %d) mod 26 = %d", plainPos, keyPos, cipherPos)))
+		fmt.Println(ui.BrightCyan(fmt.Sprintf("   Position %d = letter '%c'", cipherPos, cipherChar)))
+	} else {
+		fmt.Println(ui.Yellow(fmt.Sprintf("   Ciphertext '%c' = position %d", plainChar, plainPos)))
+		fmt.Println(ui.Yellow(fmt.Sprintf("   Key '%c'        = position %d (shift)", keyChar, keyPos)))
+		fmt.Println(ui.Yellow("   ───────────────────────────────"))
+		fmt.Println(ui.BrightYellow(fmt.Sprintf("   (%d - %d + 26) mod 26 = %d", plainPos, keyPos, cipherPos)))
+		fmt.Println(ui.BrightCyan(fmt.Sprintf("   Position %d = letter '%c'", cipherPos, cipherChar)))
 	}
 
 	fmt.Println()
-	fmt.Println(ui.BrightGreen("💡 How to use:"))
-	fmt.Println(ui.Green("   1. Find the plaintext letter in the top row (column header)"))
-	fmt.Println(ui.Green("   2. Find the key letter in the left column (row header)"))
-	fmt.Println(ui.Green("   3. The intersection is your ciphertext letter!"))
+	fmt.Println(ui.BrightGreen("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	fmt.Println(ui.BrightGreenBold("🎯 SUMMARY:"))
+	if v.mode == "encrypt" {
+		fmt.Println(ui.Green(fmt.Sprintf("   To encrypt '%c' with key '%c':", plainChar, keyChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   1. Find column '%c' (plaintext)", plainChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   2. Find row '%c' (key)", keyChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   3. Read intersection: '%c' (ciphertext)", cipherChar)))
+	} else {
+		fmt.Println(ui.Green(fmt.Sprintf("   To decrypt '%c' with key '%c':", plainChar, keyChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   1. Find column '%c' (ciphertext)", plainChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   2. Find row '%c' (key)", keyChar)))
+		fmt.Println(ui.Green(fmt.Sprintf("   3. Read intersection: '%c' (plaintext)", cipherChar)))
+	}
+	fmt.Println(ui.BrightGreen("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
 	fmt.Println()
+}
+
+// Helper functions for min/max
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+	return b
 }
 
 func (v *Vigenere) cleanText(text string) string {
