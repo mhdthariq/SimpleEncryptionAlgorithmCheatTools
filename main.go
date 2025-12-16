@@ -37,7 +37,8 @@ func main() {
 		algoTable.AppendRows([]table.Row{
 			{ui.BrightYellow("1"), ui.BrightGreen("🔐 RC4"), ui.Cyan("Stream cipher encryption")},
 			{ui.BrightYellow("2"), ui.BrightGreen("⚡ ChaCha20"), ui.Cyan("Modern stream cipher (Visualized)")},
-			{ui.BrightYellow("3"), ui.BrightRed("🚪 Exit"), ui.Cyan("Exit the program")},
+			{ui.BrightYellow("3"), ui.BrightGreen("📜 Vigenère"), ui.Cyan("Classic polyalphabetic cipher")},
+			{ui.BrightYellow("4"), ui.BrightRed("🚪 Exit"), ui.Cyan("Exit the program")},
 		})
 		algoTable.Render()
 		fmt.Println()
@@ -46,7 +47,7 @@ func main() {
 		choice, _ := reader.ReadString('\n')
 		choice = strings.TrimSpace(choice)
 
-		if choice == "3" || strings.ToLower(choice) == "exit" {
+		if choice == "4" || strings.ToLower(choice) == "exit" {
 			fmt.Println()
 			ui.PrintColorfulLine(80)
 			fmt.Println(ui.BrightGreenBold("✨ Thank you for using the Encryption Algorithm Calculator!"))
@@ -64,10 +65,12 @@ func main() {
 			algo = algorithms.NewRC4()
 		case "2", "chacha20":
 			algo = algorithms.NewChaCha20()
+		case "3", "vigenere":
+			algo = algorithms.NewVigenere()
 		default:
 			fmt.Println()
 			fmt.Println(ui.RedBold("❌ Invalid choice! Please select a valid option."))
-			fmt.Println(ui.YellowBold("💡 Hint: Choose 1, 2, or 3"))
+			fmt.Println(ui.YellowBold("💡 Hint: Choose 1, 2, 3, or 4"))
 			fmt.Println()
 			fmt.Print(ui.Cyan("Press Enter to try again..."))
 			reader.ReadString('\n')

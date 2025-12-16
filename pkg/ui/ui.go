@@ -142,6 +142,10 @@ func BrightRedBold(text string) string {
 	return ColorBold + ColorBrightRed + text + ColorReset
 }
 
+func BrightBlueBold(text string) string {
+	return ColorBold + ColorBrightBlue + text + ColorReset
+}
+
 // Decorative lines
 func PrintColorfulLine(length int) {
 	colors := []string{ColorRed, ColorYellow, ColorGreen, ColorCyan, ColorBlue, ColorMagenta}

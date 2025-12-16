@@ -189,7 +189,8 @@ You'll see a colorful welcome screen:
 ├───┼─────────────┼────────────────────────────┤
 │ 1 │ 🔐 RC4      │ Stream cipher encryption   │
 │ 2 │ ⚡ ChaCha20 │ Modern stream cipher       │
-│ 3 │ 🚪 Exit     │ Exit the program           │
+│ 3 │ 📜 Vigenère │ Classic polyalphabetic     │
+│ 4 │ 🚪 Exit     │ Exit the program           │
 └───┴─────────────┴────────────────────────────┘
 
 👉 Select option: 1
@@ -209,6 +210,23 @@ The program will display:
 - 🔐 PRGA phase with encryption process
 - 🔬 XOR analysis with binary breakdowns
 - 🎉 Final results with rainbow celebrations
+
+### Example: Vigenère Cipher
+```
+👉 Select option: 3
+
+📝 Please input Plaintext: HELLO WORLD
+🔑 Please input Key: SECRET
+Would you like to encrypt or decrypt? (e/d) [default: e]: e
+Preserve spaces and punctuation? (y/n) [default: y]: y
+```
+
+The program displays:
+- 📊 **Tabula Recta** - Full 26×26 Vigenère square
+- 🔑 **Key Repetition** - How the key aligns with text
+- 🔬 **Step-by-Step** - Each character transformation with calculations
+- 📈 **Cryptanalysis** - Security analysis and historical context
+- 🎓 **Educational** - Attack methods and recommendations
 
 ---
 
@@ -294,6 +312,69 @@ SA (Key-Scheduling Algorithm)** - State array scrambling
 
 ---
 
+### 3. Vigenère Cipher
+**Classic polyalphabetic substitution cipher**
+
+**What You'll See**:
+- ✨ **Setup Phase** - Configuration and parameters
+  - Encryption/Decryption mode selection
+  - Input text and key
+  - Alphabet configuration
+  - Space preservation options
+- 📊 **Tabula Recta (Vigenère Table)** - The famous cipher square
+  - 26×26 grid of shifted alphabets
+  - Color-coded rows and columns
+  - Visual guide for encryption
+  - How-to-use instructions
+- 🔑 **Key Repetition Pattern** - Key alignment visualization
+  - Input text display
+  - Repeated key pattern
+  - Character-by-character mapping
+- 🔬 **Step-by-Step Transformation** - Detailed encryption process
+  - Position-by-position analysis
+  - Shift calculations for each letter
+  - Mathematical formulas (mod 26)
+  - Before/After character display
+- 🎯 **Complete Transformation** - Visual flow
+  - Input → Output mapping
+  - Preserved spacing visualization
+  - Arrow indicators
+- 📈 **Cryptanalysis Insights** - Security analysis
+  - Historical significance
+  - Strengths and weaknesses
+  - Key length analysis
+  - Attack method descriptions
+  - Modern recommendations
+- 🎓 **Educational Information**
+  - Kasiski examination
+  - Friedman test
+  - Frequency analysis techniques
+  - Security ratings
+
+**Educational Features**:
+- Full Tabula Recta display
+- Character-by-character walkthrough
+- Historical context (16th century)
+- Cryptanalysis education
+- Key strength analysis
+- Attack method explanations
+
+**Unique Features**:
+- Both encryption AND decryption modes
+- Preserves spaces and punctuation (optional)
+- Automatic key repetition
+- Real-time security assessment
+- Famous for being "unbreakable" for 300 years
+
+**Specifications**:
+- Standard 26-letter alphabet (A-Z)
+- Case-insensitive operation
+- Variable key length
+- Polyalphabetic substitution
+- Modulo 26 arithmetic
+
+---
+
 ## 🎨 Color System
 
 ### Our Philosophy
@@ -365,11 +446,18 @@ cheat-encryption-algorithm/
 │   │   │   ├── XOR analysis
 │   │   │   └── Results display
 │   │   │
-│   │   └── chacha20.go              # ChaCha20 implementation (302 lines)
-│   │       ├── State initialization
-│   │       ├── Quarter rounds
-│   │       ├── Keystream generation
-│   │       └── Encryption
+│   │   ├── chacha20.go              # ChaCha20 implementation (302 lines)
+│   │   │   ├── State initialization
+│   │   │   ├── Quarter rounds
+│   │   │   ├── Keystream generation
+│   │   │   └── Encryption
+│   │   │
+│   │   └── vigenere.go              # Vigenère implementation (645 lines)
+│   │       ├── Tabula recta display
+│   │       ├── Key repetition
+│   │       ├── Character transformation
+│   │       ├── Cryptanalysis insights
+│   │       └── Educational content
 │   │
 │   └── ui/
 │       └── ui.go                    # UI utilities (193 lines)
@@ -461,6 +549,54 @@ Please input Nonce: [Enter for default]
 
 ---
 
+### Example 4: Vigenère Cipher Encryption
+```bash
+Select option: 3
+Please input Plaintext: ATTACK AT DAWN
+Please input Key: LEMON
+Would you like to encrypt or decrypt? (e/d) [default: e]: e
+Preserve spaces and punctuation? (y/n) [default: y]: y
+```
+
+**Output Highlights**:
+- Full 26×26 Tabula Recta (Vigenère square)
+- Color-coded key repetition pattern
+- Character-by-character transformation table
+- Mathematical formulas (mod 26 arithmetic)
+- Visual input → output flow with arrows
+- Historical context (300 years unbroken!)
+- Cryptanalysis insights (Kasiski, Friedman)
+- Key strength analysis
+- Attack method descriptions
+- Security recommendations
+
+**Result**:
+```
+Plaintext:  ATTACK AT DAWN
+Key:        LEMONL EM ONLE
+Ciphertext: LXFOPV EF RNH R
+```
+
+---
+
+### Example 5: Vigenère Cipher Decryption
+```bash
+Select option: 3
+Please input Plaintext: LXFOPV EF RNHR
+Please input Key: LEMON
+Would you like to encrypt or decrypt? (e/d) [default: e]: d
+Preserve spaces and punctuation? (y/n) [default: y]: y
+```
+
+**Output Highlights**:
+- Same beautiful visualization
+- Reverse calculations shown
+- Decryption formulas: (cipher - key) mod 26
+- Verification of original message
+- Educational content about breaking Vigenère
+
+---
+
 ## 🖼️ Screenshots & Visuals
 
 ### Main Menu
@@ -479,7 +615,8 @@ Please input Nonce: [Enter for default]
 ├───┼─────────────┼──────────────────────────┤
 │ 1 │ 🔐 RC4      │ Stream cipher encryption │
 │ 2 │ ⚡ ChaCha20 │ Modern stream cipher     │
-│ 3 │ 🚪 Exit     │ Exit the program         │
+│ 3 │ 📜 Vigenère │ Classic polyalphabetic   │
+│ 4 │ 🚪 Exit     │ Exit the program         │
 └───┴─────────────┴──────────────────────────┘
 ```
 
@@ -526,6 +663,65 @@ Binary Representation
 ├──────────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┼──────┤
 │Result(210)│  1   │  1   │  0   │  0   │  0   │  1   │  1   │  0   │
 └──────────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┴──────┘
+```
+
+### Vigenère Tabula Recta
+```
+📊 The Vigenère square shows all possible Caesar shifts:
+   • Each row is shifted one position from the previous
+   • The key letter determines which row to use
+   • The plaintext letter determines which column to use
+
+   │ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
+───┼────────────────────────────────────────────────────
+ A │ A B C D E F G H I J K L M N O P Q R S T U V W X Y Z 
+ B │ B C D E F G H I J K L M N O P Q R S T U V W X Y Z A 
+ C │ C D E F G H I J K L M N O P Q R S T U V W X Y Z A B 
+ D │ D E F G H I J K L M N O P Q R S T U V W X Y Z A B C 
+ E │ E F G H I J K L M N O P Q R S T U V W X Y Z A B C D 
+ F │ F G H I J K L M N O P Q R S T U V W X Y Z A B C D E 
+ G │ G H I J K L M N O P Q R S T U V W X Y Z A B C D E F 
+ H │ H I J K L M N O P Q R S T U V W X Y Z A B C D E F G 
+ I │ I J K L M N O P Q R S T U V W X Y Z A B C D E F G H 
+ J │ J K L M N O P Q R S T U V W X Y Z A B C D E F G H I 
+ K │ K L M N O P Q R S T U V W X Y Z A B C D E F G H I J 
+ L │ L M N O P Q R S T U V W X Y Z A B C D E F G H I J K 
+ M │ M N O P Q R S T U V W X Y Z A B C D E F G H I J K L 
+   ... (showing 13 of 26 rows) ...
+
+💡 How to use:
+   1. Find the plaintext letter in the top row (column header)
+   2. Find the key letter in the left column (row header)
+   3. The intersection is your ciphertext letter!
+```
+
+### Vigenère Character Transformation
+```
+🔍 Detailed character-by-character transformation:
+
+Step 2: Character Transformation
+Each letter is shifted by the corresponding key letter:
+
+┌─────┬──────────┬─────┬───────┬──────────────────────┬────────┐
+│ Pos │ Input    │ Key │ Shift │ Calculation          │ Output │
+├─────┼──────────┼─────┼───────┼──────────────────────┼────────┤
+│ 1   │ A (0)    │ L(11)│ +11  │ (0 + 11) mod 26 = 11 │ L (11) │
+│ 2   │ T (19)   │ E(4) │ +4   │ (19 + 4) mod 26 = 23 │ X (23) │
+│ 3   │ T (19)   │ M(12)│ +12  │ (19 + 12) mod 26 = 5 │ F (5)  │
+│ 4   │ A (0)    │ O(14)│ +14  │ (0 + 14) mod 26 = 14 │ O (14) │
+│ 5   │ C (2)    │ N(13)│ +13  │ (2 + 13) mod 26 = 15 │ P (15) │
+│ 6   │ K (10)   │ L(11)│ +11  │ (10 + 11) mod 26 = 21│ V (21) │
+│ 7   │   (—)    │ —    │ —    │ (preserved)          │   (—)  │
+│ 8   │ A (0)    │ E(4) │ +4   │ (0 + 4) mod 26 = 4   │ E (4)  │
+│ 9   │ T (19)   │ M(12)│ +12  │ (19 + 12) mod 26 = 5 │ F (5)  │
+...
+└─────┴──────────┴─────┴───────┴──────────────────────┴────────┘
+
+Step 3: Complete Transformation
+
+Input:  ATTACK AT DAWN
+        ↓↓↓↓↓↓ ↓↓ ↓↓↓↓
+Output: LXFOPV EF RNHR
 ```
 
 ---
@@ -933,7 +1129,7 @@ echo "Testing colors..."
 1. **Observation**: "What color is used for 'Before' states?"
 2. **Prediction**: "What will the next swap do?"
 3. **Analysis**: "Why did the output change?"
-4. **Comparison**: "How does RC4 differ from ChaCha20?"
+4. **Comparison**: "How does RC4 differ from ChaCha20 and Vigenère?"
 
 ### Homework Assignments
 
@@ -949,7 +1145,7 @@ echo "Testing colors..."
 
 **Advanced Level**:
 - Implement own simple cipher
-- Compare security with RC4/ChaCha20
+- Compare security with RC4/ChaCha20/Vigenère
 - Write report on modern alternatives
 
 ### Assessment Ideas
@@ -1215,7 +1411,7 @@ To become the **most beautiful and educational** cryptography visualization tool
 - **FAQs**: 15+
 
 ### Educational Value
-- **Algorithms**: 2 (RC4, ChaCha20)
+- **Algorithms**: 3 (RC4, ChaCha20, Vigenère)
 - **Visualization Phases**: 8+ per algorithm
 - **Learning Outcomes**: 6+
 - **Cognitive Benefits**: Multiple
