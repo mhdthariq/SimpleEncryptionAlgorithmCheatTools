@@ -146,8 +146,12 @@ func BrightBlueBold(text string) string {
 	return ColorBold + ColorBrightBlue + text + ColorReset
 }
 
-// Decorative lines
+// Decorative lines - responsive (no fixed width)
 func PrintColorfulLine(length int) {
+	// If length is too large (like 80), reduce it for mobile
+	if length > 50 {
+		length = 50
+	}
 	colors := []string{ColorRed, ColorYellow, ColorGreen, ColorCyan, ColorBlue, ColorMagenta}
 	line := ""
 	for i := 0; i < length; i++ {
@@ -157,18 +161,23 @@ func PrintColorfulLine(length int) {
 }
 
 func PrintStarLine(length int) {
+	// Reduce for mobile
+	if length > 20 {
+		length = 20
+	}
 	fmt.Println(BrightYellow(strings.Repeat("★ ", length/2)))
 }
 
 func PrintSectionHeader(title string) {
-	// Colorful header with rainbow effect
-	fmt.Println()
-	PrintColorfulLine(80)
-	fmt.Println(BrightCyanBold("╔" + strings.Repeat("═", 78) + "╗"))
-	fmt.Println(BrightCyanBold("║") + BrightMagentaBold(centerText(strings.ToUpper(title), 78)) + BrightCyanBold("║"))
-	fmt.Println(BrightCyanBold("╚" + strings.Repeat("═", 78) + "╝"))
-	PrintColorfulLine(80)
-	fmt.Println()
+	// Colorful header - responsive
+	PrintColorfulLine(50)
+	fmt.Println(BrightMagentaBold(strings.ToUpper(title)))
+	PrintColorfulLine(50)
+}
+
+// PrintSeparator - responsive separator line
+func PrintSeparator() {
+	fmt.Println(BrightCyan("─────────────────────────────────────────────"))
 }
 
 func centerText(text string, width int) string {

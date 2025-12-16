@@ -165,7 +165,7 @@ func (c *ChaCha20) runQuarterRounds() {
 	ui.PrintSectionHeader("THE QUARTER ROUND (Visualization)")
 	ui.PrintStarLine(40)
 	fmt.Println(ui.BrightYellowBold("🔑 Phase 1: Applying the ChaCha20 quarter-round function"))
-	fmt.Println(ui.BrightCyan("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	ui.PrintSeparator()
 	ui.PrintStarLine(40)
 	fmt.Println()
 
@@ -203,7 +203,7 @@ func (c *ChaCha20) generateKeystreamAndEncrypt() {
 	ui.PrintSectionHeader("KEYSTREAM GENERATION & XOR")
 	ui.PrintStarLine(40)
 	fmt.Println(ui.BrightYellowBold("🔐 Phase 2: Generating keystream and encrypting plaintext"))
-	fmt.Println(ui.BrightCyan("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	ui.PrintSeparator()
 	ui.PrintStarLine(40)
 	fmt.Println()
 

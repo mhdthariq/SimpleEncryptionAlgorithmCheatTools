@@ -49,11 +49,11 @@ func main() {
 
 		if choice == "4" || strings.ToLower(choice) == "exit" {
 			fmt.Println()
-			ui.PrintColorfulLine(80)
+			ui.PrintColorfulLine(50)
 			fmt.Println(ui.BrightGreenBold("✨ Thank you for using the Encryption Algorithm Calculator!"))
 			fmt.Println(ui.BrightCyanBold("🎓 Keep learning and stay curious about cryptography!"))
 			fmt.Println(ui.Rainbow("★ ★ ★  G O O D B Y E  ★ ★ ★"))
-			ui.PrintColorfulLine(80)
+			ui.PrintColorfulLine(50)
 			fmt.Println()
 			break
 		}
@@ -79,9 +79,9 @@ func main() {
 
 		// Common Inputs
 		fmt.Println()
-		ui.PrintColorfulLine(80)
-		fmt.Println(ui.BrightMagentaBold(fmt.Sprintf("╔═══ %s Encryption ═══╗", algo.GetName())))
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
+		fmt.Println(ui.BrightMagentaBold(fmt.Sprintf("═══ %s Encryption ═══", algo.GetName())))
+		ui.PrintColorfulLine(50)
 		fmt.Println()
 
 		fmt.Print(ui.BrightYellowBold("📝 Please input Plaintext: "))
@@ -108,11 +108,11 @@ func main() {
 
 		// Wait before clearing
 		fmt.Println()
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 		fmt.Println(ui.BrightGreenBold("✅ Encryption process complete!"))
 		fmt.Println(ui.BrightCyanBold("🎉 Successfully encrypted your message!"))
-		fmt.Println(ui.Rainbow("★ ★ ★  P R O C E S S   C O M P L E T E  ★ ★ ★"))
-		ui.PrintColorfulLine(80)
+		fmt.Println(ui.Rainbow("★ ★ ★  COMPLETE  ★ ★ ★"))
+		ui.PrintColorfulLine(50)
 		fmt.Println()
 		fmt.Print(ui.YellowBold("👉 Press Enter to return to main menu..."))
 		reader.ReadString('\n')

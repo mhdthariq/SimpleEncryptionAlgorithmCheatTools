@@ -128,7 +128,7 @@ func (r *RC4) runKSA() {
 	ui.PrintSectionHeader("KEY-SCHEDULING ALGORITHM (KSA)")
 	ui.PrintStarLine(40)
 	fmt.Println(ui.BrightYellowBold("🔑 Phase 1: Scrambling the state array using the key"))
-	fmt.Println(ui.BrightCyan("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	ui.PrintSeparator()
 	ui.PrintStarLine(40)
 	fmt.Println()
 
@@ -145,9 +145,9 @@ func (r *RC4) runKSA() {
 	keyLen := len(r.keyASC)
 
 	for i := 0; i < r.stateSize; i++ {
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 		fmt.Printf("%s %s (i = %s)\n", ui.BrightMagentaBold("🔄 KSA Iteration"), ui.BrightYellow(fmt.Sprintf("%d", i+1)), ui.BrightCyan(fmt.Sprintf("%d", i)))
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 
 		fmt.Println(ui.BrightCyanBold("📊 Current State:"))
 		fmt.Printf("  %s %s = %s  │  %s = %s\n",
@@ -198,7 +198,7 @@ func (r *RC4) runKSA() {
 		fmt.Println()
 	}
 
-	fmt.Println(ui.BrightGreen(strings.Repeat("━", 80)))
+	ui.PrintSeparator()
 	resultTable := ui.GetTableWriter()
 	resultTable.SetTitle(ui.BrightGreenBold("✓ KSA RESULT"))
 	resultTable.AppendRow(table.Row{
@@ -206,7 +206,7 @@ func (r *RC4) runKSA() {
 		ui.BrightGreen(fmt.Sprintf("%v", r.S)),
 	})
 	resultTable.Render()
-	fmt.Println(ui.BrightGreen(strings.Repeat("━", 80)))
+	ui.PrintSeparator()
 	fmt.Println()
 }
 
@@ -214,7 +214,7 @@ func (r *RC4) runPRGA() {
 	ui.PrintSectionHeader("PSEUDO-RANDOM GENERATION ALGORITHM (PRGA)")
 	ui.PrintStarLine(40)
 	fmt.Println(ui.BrightYellowBold("🔐 Phase 2: Generating keystream and encrypting plaintext"))
-	fmt.Println(ui.BrightCyan("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"))
+	ui.PrintSeparator()
 	ui.PrintStarLine(40)
 	fmt.Println()
 
@@ -229,13 +229,13 @@ func (r *RC4) runPRGA() {
 	r.ciphertext = make([]int, len(r.plaintextASC))
 
 	for byteIdx, plaintextByte := range r.plaintextASC {
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 		fmt.Printf("%s %s: Encrypt Byte %s (%s)\n",
 			ui.BrightMagentaBold("🔐 Step"),
 			ui.BrightCyan(fmt.Sprintf("%d", byteIdx+1)),
 			ui.BrightYellowBold(fmt.Sprintf("'%c'", rune(plaintextByte))),
 			ui.BrightYellow(fmt.Sprintf("%d", plaintextByte)))
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 
 		// Step 1: Update Indices
 		fmt.Printf("%s PRGA Step %s: %s\n",
@@ -358,7 +358,7 @@ func (r *RC4) printXORAnalysis() {
 		keyByte := r.keystream[i]
 		cipherByte := r.ciphertext[i]
 
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 		fmt.Printf("%s %s: Plaintext %s (%s) %s Keystream (%s) = Ciphertext (%s)\n",
 			ui.BrightMagentaBold("🔍 XOR Analysis"),
 			ui.BrightCyan(fmt.Sprintf("%d", i+1)),
@@ -367,7 +367,7 @@ func (r *RC4) printXORAnalysis() {
 			ui.MagentaBold("⊕"),
 			ui.BrightGreen(fmt.Sprintf("%d", keyByte)),
 			ui.BrightRedBold(fmt.Sprintf("%d", cipherByte)))
-		ui.PrintColorfulLine(80)
+		ui.PrintColorfulLine(50)
 
 		plainBin := fmt.Sprintf("%08b", plainByte)
 		keyBin := fmt.Sprintf("%08b", keyByte)
